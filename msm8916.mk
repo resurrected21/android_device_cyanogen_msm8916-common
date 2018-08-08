@@ -25,10 +25,6 @@ PRODUCT_PACKAGES += \
     com.dsi.ant.antradio_library \
     libantradio
 
-# apn
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/apns-conf.xml:system/etc/apns-conf.xml
-
 # Audio
 PRODUCT_PACKAGES += \
     audio.a2dp.default \
