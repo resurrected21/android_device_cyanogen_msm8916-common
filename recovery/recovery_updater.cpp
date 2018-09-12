@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "edify/expr.h"
+#include "edify/include/edify/expr.h"
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
