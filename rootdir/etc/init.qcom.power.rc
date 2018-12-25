@@ -32,7 +32,7 @@ on enable-low-power
     write /sys/module/cpu_boost/parameters/input_boost_freq "0:200000 1:1094400" 
 
     # Enable low power modes
-    write /sys/module/lpm_levels/parameters/sleep_disabled 0
+    write /sys/module/lpm_levels/parameters/sleep_disabled 1
 
     # Set RPS mask
     write /sys/class/net/rmnet0/queues/rx-0/rps_cpus 2
@@ -86,14 +86,12 @@ on charger
     # HMP Task packing settings for 8916
     write /proc/sys/kernel/sched_small_task 50
     
-    # disable thermal core_control to update scaling_min_freq
-    write /sys/module/msm_thermal/core_control/enabled 0
+    #thermal core_control to update scaling_min_freq
+    write /sys/module/msm_thermal/core_control/enabled 1
     write /sys/devices/system/cpu/cpu0/online 1
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "powersave"
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 200000
-    # enable thermal core_control now
-    write /sys/module/msm_thermal/core_control/enabled 1
-
+    
 on property:dev.bootcomplete=1
     trigger enable-low-power
     setprop sys.io.scheduler "cfq"
