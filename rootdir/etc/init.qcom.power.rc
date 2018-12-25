@@ -7,8 +7,9 @@ on enable-low-power
 
     # HMP Task packing settings for 8916
     write /proc/sys/kernel/sched_small_task 20
-    write /proc/sys/kernel/sched_mostly_idle_load 30
-    write /proc/sys/kernel/sched_mostly_idle_nr_run 3
+    
+    # disable thermal core_control to update governor settings
+    write /sys/module/msm_thermal/core_control/enabled 0
 
     # enable governor
     write /sys/devices/system/cpu/cpu0/online 1
@@ -27,12 +28,8 @@ on enable-low-power
     write /sys/devices/system/cpu/cpufreq/interactive/InStreamFreq 1094400
     write /sys/devices/system/cpu/cpu0/cpufreq/interactive/io_is_busy 0
     
-    # Enable CPU-BOOST
-    write /sys/module/cpu_boost/parameters/input_boost_ms 120
-    write /sys/module/cpu_boost/parameters/input_boost_freq "0:200000 1:1094400" 
-
     # Enable low power modes
-    write /sys/module/lpm_levels/parameters/sleep_disabled 1
+    write /sys/module/lpm_levels/parameters/sleep_disabled 0
 
     # Set RPS mask
     write /sys/class/net/rmnet0/queues/rx-0/rps_cpus 2
@@ -61,37 +58,20 @@ on enable-low-power
     write /dev/cpuset/top-app/cpus 0-3
     write /dev/cpuset/camera-daemon/cpus 0-3
 
-    # disable wakelocks
-    write /sys/module/wakeup/parameters/enable_qcom_rx_wakelock_ws 0
-    write /sys/module/wakeup/parameters/enable_wlan_extscan_wl_ws 0
-    write /sys/module/wakeup/parameters/enable_ipa_ws 0
-    write /sys/module/wakeup/parameters/enable_wlan_ws 0
-    write /sys/module/wakeup/parameters/enable_timerfd_ws 0
-    write /sys/module/wakeup/parameters/enable_netlink_ws 0
-    write /sys/module/wakeup/parameters/enable_netmgr_wl_ws 0
-    write /sys/module/wakeup/parameters/enable_wlan_pno_wl_ws 0
-    write /sys/module/wakeup/parameters/enable_wcnss_filter_lock_ws 0
-
     rm /data/system/perfd/default_values
     start perfd
 
 on charger
     start thermal-com
     write /sys/module/lpm_levels/parameters/sleep_disabled 0
-    
-    # HMP scheduler settings
-    write /proc/sys/kernel/sched_ravg_hist_size 3
-    write /proc/sys/kernel/sched_window_stats_policy 3
-
-    # HMP Task packing settings for 8916
-    write /proc/sys/kernel/sched_small_task 50
-    
-    #thermal core_control to update scaling_min_freq
+   
+    #enable thermal core_control now
     write /sys/module/msm_thermal/core_control/enabled 1
+    
     write /sys/devices/system/cpu/cpu0/online 1
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "powersave"
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 200000
     
 on property:dev.bootcomplete=1
     trigger enable-low-power
-    setprop sys.io.scheduler "cfq"
+    setprop sys.io.scheduler "bfq"
